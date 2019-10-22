@@ -1,0 +1,32 @@
+# Github settings
+github:
+  # API token - https://github.com/settings/tokens
+  auth: ''
+  # Repository owner, e.g. organization or user name
+  owner: ''
+  # Repository to export issues from
+  repo: ''
+  # JIRAIssue state to import: [ 'all' | 'open' | 'closed' ]
+  state: 'all'
+  # Include pull requests?
+  includePrs: false
+  # Include comments?
+  includeComments: true
+
+# JIRA Settings
+jira:
+  # JiraProject key for the JIRA project to import issues into
+  projectKey: ''
+
+# User mapping, github user => jira user
+userMap:
+  'githubUser': 'jiraUser'
+
+# JIRAIssue type mapping from labels: github label => jira issue type
+defaultIssueType: 'Story'
+issueTypeMap:
+  githubLabel: jiraIssueType
+
+defaultPriority: 'Medium'
+priorityMap:
+  githubLabel : jiraPriority

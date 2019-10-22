@@ -1,6 +1,6 @@
 {
   "name": "jira-json-github-import",
-  "version": "1.0.0",
+  "version": "0.0.1-wip",
   "description": "Import Github issues to JIRA via the JIRA JSON importer",
   "main": "index.js",
   "scripts": {
@@ -16,6 +16,17 @@
   "author": "David Gee",
   "license": "MIT",
   "dependencies": {
-    "octokit": "^1.0.0-hello-world"
+    "@kenchan0130/markdown-to-atlassian-wiki-markup": "^1.2.2",
+    "@octokit/rest": "^16.33.1",
+    "chalk": "^2.4.2",
+    "ts-node-dev": "^1.0.0-pre.43",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4",
+    "winston": "^3.2.1",
+    "yaml": "^1.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^12.11.1",
+    "@types/yaml": "^1.2.0"
   }
 }
