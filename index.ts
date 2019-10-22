@@ -116,6 +116,9 @@ const mdToWiki = (md: string): string => {
   }
 };
 
+const mapGithubUserToJiraUser = (githubUser: GithubUser) =>
+    githubUser ? userMap[githubUser.login] || githubUser.login : null;
+
 /**
  * Transforms an array of Github comment objects to JIRA format.
  * @param githubComments
@@ -130,7 +133,7 @@ const mapGithubCommentsToJiraComments = (
   );
   return githubComments.map(comment => ({
     body: mdToWiki(comment.body),
-    author: comment.user.login,
+    author: mapGithubUserToJiraUser(comment.user),
     created: mapDate(comment.created_at),
   }));
 };
@@ -221,12 +224,10 @@ const mapGithubIssueToJiraIssue = (
 
   return {
     key: `${projectKey}-${issue.number}`,
-    status: 'To Do',
+    status: issue.state === 'closed' ? 'Done' : 'To Do',
     resolution: issue.state === 'closed' ? 'Fixed' : null,
-    reporter: userMap[issue.user.login],
-    assignee: issue.assignee
-      ? userMap[issue.assignee.login] || issue.assignee.login
-      : null,
+    reporter: mapGithubUserToJiraUser(issue.user),
+    assignee: mapGithubUserToJiraUser(issue.assignee),
     fixedVersions: issue.milestone ? [issue.milestone.title] : [],
     created: mapDate(issue.created_at),
     updated: mapDate(issue.updated_at),
@@ -241,6 +242,7 @@ const mapGithubIssueToJiraIssue = (
       : [],
   };
 };
+
 
 /**
  * Maps a collection of Github issues and comments to JIRA issues with embedded comments
