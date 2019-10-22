@@ -28,5 +28,9 @@
   "devDependencies": {
     "@types/node": "^12.11.1",
     "@types/yaml": "^1.2.0"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "es5"
   }
 }

@@ -1,5 +1,5 @@
-import Octokit from "@octokit/rest";
-import chalk from "chalk";
+import Octokit from '@octokit/rest';
+import chalk from 'chalk';
 export default class GithubDataLoader {
   private readonly options: { owner: string; repo: string; state: string };
   private readonly kit: Octokit;
@@ -7,10 +7,10 @@ export default class GithubDataLoader {
     this.options = {
       owner,
       repo,
-      state
+      state,
     };
     this.kit = new Octokit({
-      auth
+      auth,
     });
   }
 
@@ -20,7 +20,7 @@ export default class GithubDataLoader {
       .paginate(
         this.kit.issues.listForRepo.endpoint.merge({
           ...this.options,
-          per_page: 100
+          per_page: 100,
         })
       )
       .then(data => {
@@ -39,7 +39,7 @@ export default class GithubDataLoader {
       .paginate(
         this.kit.issues.listCommentsForRepo.endpoint.merge({
           ...this.options,
-          per_page: 100
+          per_page: 100,
         })
       )
       .then(data => {

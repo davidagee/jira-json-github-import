@@ -1,23 +1,23 @@
-import { markdownToAtlassianWikiMarkup } from "@kenchan0130/markdown-to-atlassian-wiki-markup";
-import chalk from "chalk";
-import fs from "fs";
-import yaml from "yaml";
+import { markdownToAtlassianWikiMarkup } from '@kenchan0130/markdown-to-atlassian-wiki-markup';
+import chalk from 'chalk';
+import fs from 'fs';
+import yaml from 'yaml';
 
-import GithubDataLoader from "./GithubDataLoader";
+import GithubDataLoader from './GithubDataLoader';
 
-const LOG_LEVEL = "debug";
-const CONFIG_YAML = "config.yaml";
-const RAW_GITHUB_FILENAME = "github.json";
-const OUTPUT_FILENAME = "output.json";
+const LOG_LEVEL = 'debug';
+const CONFIG_YAML = 'config.yaml';
+const RAW_GITHUB_FILENAME = 'github.json';
+const OUTPUT_FILENAME = 'output.json';
 
-const config = yaml.parse(fs.readFileSync(CONFIG_YAML, "utf8"));
+const config = yaml.parse(fs.readFileSync(CONFIG_YAML, 'utf8'));
 const { auth, owner, repo, state } = config.github;
 const { projectKey } = config.jira;
 const {
   priorityMap,
-  defaultPriority = "Medium",
+  defaultPriority = 'Medium',
   issueTypeMap,
-  defaultIssueType = "Story"
+  defaultIssueType = 'Story',
 } = config;
 
 const userMap = config.userMap;
@@ -31,7 +31,7 @@ export interface GithubComment {
 export interface GithubIssue {
   labels: GithubLabel[];
   number: number;
-  state: "open" | "closed";
+  state: 'open' | 'closed';
   user: GithubUser;
   assignee: GithubUser;
   created_at: string;
@@ -91,10 +91,10 @@ export interface JiraProject {
  * @param filename - The name of the file to write
  */
 const writeJSON = (data: object, filename: string): object => {
-  if (LOG_LEVEL === "debug") {
+  if (LOG_LEVEL === 'debug') {
     console.log(`Writing ${chalk.yellow(filename)}...\n`);
   }
-  fs.writeFileSync(filename, JSON.stringify(data, null, 2), "utf8");
+  fs.writeFileSync(filename, JSON.stringify(data, null, 2), 'utf8');
   return data;
 };
 
@@ -131,7 +131,7 @@ const mapGithubCommentsToJiraComments = (
   return githubComments.map(comment => ({
     body: mdToWiki(comment.body),
     author: comment.user.login,
-    created: mapDate(comment.created_at)
+    created: mapDate(comment.created_at),
   }));
 };
 
@@ -186,10 +186,14 @@ const mapLabelsToCustomFields = (
           .reduce(
             (acc, label) => [
               ...acc,
-              prefixes.reduce((result, prefix) => result.replace(prefix, ""), label)
+              prefixes.reduce(
+                (result, prefix) => result.replace(prefix, ''),
+                label
+              ),
             ],
             <string[]>[]
           )
+          .map(label => label.split(' ').join('_')),
   }));
 };
 
@@ -217,8 +221,8 @@ const mapGithubIssueToJiraIssue = (
 
   return {
     key: `${projectKey}-${issue.number}`,
-    status: "To Do",
-    resolution: issue.state === "closed" ? "Fixed" : null,
+    status: 'To Do',
+    resolution: issue.state === 'closed' ? 'Fixed' : null,
     reporter: userMap[issue.user.login],
     assignee: issue.assignee
       ? userMap[issue.assignee.login] || issue.assignee.login
@@ -234,7 +238,7 @@ const mapGithubIssueToJiraIssue = (
     customFieldValues: mapLabelsToCustomFields(issue.labels),
     comments: issueComments
       ? mapGithubCommentsToJiraComments(issueComments)
-      : []
+      : [],
   };
 };
 
@@ -259,7 +263,7 @@ const mapGithubIssuesToJiraIssues = (githubIssues, commentsDictionary) => {
  */
 const createCommentDictionary = (githubComments: GithubComment[]): object =>
   githubComments.reduce((dictionary, comment) => {
-    const issueNumber = <string>comment.issue_url.split("/").pop();
+    const issueNumber = <string>comment.issue_url.split('/').pop();
     dictionary[issueNumber] = dictionary[issueNumber]
       ? [...dictionary[issueNumber], comment]
       : [comment];
@@ -276,11 +280,11 @@ const mapGithubDataToJiraData = githubData => {
     externalName: repo,
     key: config.jira.projectKey,
     issues,
-    versions: [...new Set(issues.flatMap(issue => issue.fixedVersions))]
+    versions: [...new Set(issues.flatMap(issue => issue.fixedVersions))],
   };
 
   return {
-    projects: [project]
+    projects: [project],
   };
 };
 
@@ -292,31 +296,31 @@ const issueLoader = new GithubDataLoader({
   auth,
   owner,
   repo,
-  state
+  state,
 });
 
 const dataSets = [
   issueLoader.fetchIssues(),
   config.github.includeComments
     ? issueLoader.fetchComments()
-    : Promise.resolve(null)
+    : Promise.resolve(null),
 ];
 
 Promise.all(dataSets)
   .then(([githubIssues, githubComments]) => {
     return {
       githubIssues,
-      githubComments
+      githubComments,
     };
   })
   .then(objData =>
-    LOG_LEVEL === "debug" ? writeJSON(objData, RAW_GITHUB_FILENAME) : objData
+    LOG_LEVEL === 'debug' ? writeJSON(objData, RAW_GITHUB_FILENAME) : objData
   )
   .then(mapGithubDataToJiraData)
   .then(jiraData => writeJSON(jiraData, OUTPUT_FILENAME))
   .catch(e => {
     console.log(
-      `${chalk.redBright("Failed to convert issues:")} \n${JSON.stringify(
+      `${chalk.redBright('Failed to convert issues:')} \n${JSON.stringify(
         e,
         null,
         2
